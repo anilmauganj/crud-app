@@ -14,6 +14,7 @@ if(!isset($_SESSION['user'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -63,49 +64,142 @@ if(!isset($_SESSION['user'])) {
       <!-- Table Example -->
       <div class="bg-white p-4 rounded shadow">
         <h3 class="text-lg font-semibold mb-4">Recent Users</h3>
-        <table class="w-full table-auto">
+        <table id="usersTable" class="w-full table-auto">
           <thead>
             <tr class="bg-gray-100 text-left">
               <th class="px-4 py-2">#</th>
               <th class="px-4 py-2">Name</th>
               <th class="px-4 py-2">Email</th>
               <th class="px-4 py-2">Mobile</th>
+              <th class="px-4 py-2">Actions</th>
             </tr>
           </thead>
-          <tbody id="userBody">
-            <!-- Data will be inserted here via AJAX -->
-          </tbody>
+
         </table>
       </div>
     </main>
   </div>
+
+  <!-- Edit Model -->
+  <!-- Edit User Modal -->
+  <div id="editModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">Edit User</h2>
+      <form id="editUserForm">
+        <input type="hidden" id="editId" name="id">
+
+        <div class="mb-4">
+          <label class="block mb-1 text-sm font-medium">Name</label>
+          <input type="text" id="editName" name="name" class="w-full border border-gray-300 rounded px-3 py-2" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="block mb-1 text-sm font-medium">Email</label>
+          <input type="email" id="editEmail" name="email" class="w-full border border-gray-300 rounded px-3 py-2"
+            required>
+        </div>
+
+        <div class="mb-4">
+          <label class="block mb-1 text-sm font-medium">Mobile</label>
+          <input type="text" id="editMobile" name="mobile" class="w-full border border-gray-300 rounded px-3 py-2"
+            required>
+        </div>
+
+        <div class="flex justify-end">
+          <button type="button" id="closeModal" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">Cancel</button>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+
+
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
   <script>
   $.ajax({
-    url: "../actions/fetch-users.php",
-    method: "GET",
-    dataType: "json",
+    url: '../actions/fetch-users.php',
+    method: 'GET',
+    dataType: 'json',
     success: function(response) {
       if (response.success) {
-        let html = "";
-        response.users.forEach((user, index) => {
-          html += `
-          <tr class="border-b">
-            <td class="px-4 py-2">${index + 1}</td>
-            <td class="px-4 py-2">${user.name}</td>
-            <td class="px-4 py-2">${user.email}</td>
-            <td class="px-4 py-2">${user.mobile}</td>
-          </tr>`;
+        $('#usersTable').DataTable({
+          data: response.users,
+          destroy: true,
+          columns: [{
+              data: 'id'
+            },
+            {
+              data: 'name'
+            },
+            {
+              data: 'email'
+            },
+            {
+              data: 'mobile'
+            },
+            {
+              data: 'actions'
+            }
+          ]
         });
-        $("#userBody").html(html);
       } else {
-        alert("Failed to fetch users");
+        alert(response.message);
       }
-    },
-    error: function(xhr, status, error) {
-      console.error(error);
-      console.log(xhr.responseText);
     }
+  });
+  </script>
+
+  <script>
+  $(document).on('click', '.edit-btn', function() {
+    const userId = $(this).data('id');
+    //alert(userId);
+    $.ajax({
+      url: '../actions/get-user.php',
+      method: 'POST',
+      data: {
+        id: userId
+      },
+      dataType: 'json',
+      success: function(res) {
+        if (res.success) {
+          $('#editId').val(res.user.id);
+          $('#editName').val(res.user.name);
+          $('#editEmail').val(res.user.email);
+          $('#editMobile').val(res.user.mobile);
+          $('#editModal').removeClass('hidden');
+        } else {
+          alert('User not found');
+        }
+      }
+    });
+  });
+
+  $('#closeModal').on('click', function() {
+    $('#editModal').addClass('hidden');
+  });
+
+  $('#editUserForm').on('submit', function(e) {
+    e.preventDefault();
+    $.ajax({
+      url: '../actions/update-user.php',
+      method: 'POST',
+      data: $(this).serialize(),
+      dataType: 'json',
+      success: function(res) {
+        if (res.success) {
+          $('#editModal').addClass('hidden');
+          alert('User updated successfully!');
+          $('#usersTable').DataTable().ajax.reload(); // Refresh table
+        } else {
+          alert('Update failed!');
+        }
+      }
+    });
   });
   </script>
 

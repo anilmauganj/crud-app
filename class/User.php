@@ -36,13 +36,34 @@ class User {
    public function getAll() {
      $stmt = $this->conn->prepare("SELECT id, name, email, mobile FROM {$this->table}");
      $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+     foreach ($users as &$user) {
+        $id = $user['id'];
+
+        $user['actions'] = '
+            <button class="edit-btn bg-blue-500 text-white px-2 py-1 rounded" data-id="'.$id.'">Edit</button>
+            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded ml-2" data-id="'.$id.'">Delete</button>
+        ';
+    }
+
+    return $users;
    }
 
    // Delete user by ID
    public function delete($id) {
       $stmt = $this->conn->prepare("DELETE FROM {$this->table} WHERE id = ?");
       return $stmt->execute([$id]);
+   }
+
+   public function getById($id) {
+   $stmt = $this->conn->prepare("SELECT id, name, email, mobile FROM {$this->table} WHERE id = ?");
+   $stmt->execute([$id]);
+   return $stmt->fetch(PDO::FETCH_ASSOC);
+   }
+
+   public function update($id, $name, $email, $mobile) {
+      $stmt = $this->conn->prepare("UPDATE {$this->table} SET name = ?, email = ?, mobile = ? WHERE id = ?");
+      return $stmt->execute([$name, $email, $mobile, $id]);
    }
 
 
