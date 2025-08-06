@@ -201,6 +201,32 @@ if(!isset($_SESSION['user'])) {
       }
     });
   });
+
+  $(document).on('click', '.delete-btn', function() {
+    const userId = $(this).data('id');
+    if (confirm('Are you sure you want to delete this user?')) {
+      $.ajax({
+        url: '../actions/delete-user.php',
+        type: 'POST',
+        data: {
+          id: userId
+        },
+        dataType: 'json',
+        success: function(res) {
+          if (res.success) {
+            alert('User deleted successfully!');
+            $('#usersTable').DataTable().ajax.reload();
+          } else {
+            alert('Failed to delete user');
+          }
+        },
+        error: function() {
+          alert('Something went wrong');
+        }
+      });
+    }
+
+  });
   </script>
 
 </body>
