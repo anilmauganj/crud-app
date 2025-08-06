@@ -8,8 +8,8 @@ if(!isset($_SESSION['user'])) {
 
    exit;
 }
-
-require_once __DIR__ . '../class/User.php';
+   header('Content-Type: application/json');
+require_once __DIR__ . '/../class/User.php';
 $user = new User();
 $users = $user->getAll();
 

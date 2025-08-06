@@ -34,9 +34,9 @@ class User {
 
    //Fetch All Users
    public function getAll() {
-      $stmt = $this->conn->prepare('SELECT id, name, email FROM {$this->table}');
-
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+     $stmt = $this->conn->prepare("SELECT id, name, email, mobile FROM {$this->table}");
+     $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
    // Delete user by ID

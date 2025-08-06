@@ -1,9 +1,9 @@
 <?php
-// session_start();
-// if (isset($_SESSION['user'])) {
-//     header("Location: dashboard.php"); // Or your user list page
-//     exit;
-// }
+session_start();
+if (isset($_SESSION['user'])) {
+    header("Location: dashboard.php"); // Or your user list page
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
