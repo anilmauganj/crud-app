@@ -11,11 +11,11 @@ class User {
    }
 
    // Register a new user
-   public function register($name, $email, $password) {
+   public function register($name, $mobile, $email, $password) {
       $hash = password_hash($password, PASSWORD_DEFAULT);
-      $stmt = $this->conn->prepare("INSERT INTO {$this->table} (name, email, password) VALUES(?, ?, ?)");
+      $stmt = $this->conn->prepare("INSERT INTO {$this->table} (name,mobile, email, password) VALUES(?, ?, ?, ?)");
 
-      return $stmt->execute([$name, $email, $hash]);
+      return $stmt->execute([$name, $mobile, $email, $hash]);
    }
 
    // Login user.
