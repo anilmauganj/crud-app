@@ -1,6 +1,7 @@
 <?php
 
 class Database {
+  
   private $host = 'localhost';
   private $db_name = 'crud_app';
   private $username = 'root';
@@ -12,7 +13,7 @@ class Database {
 
     try {
        $this->conn = new PDO(
-        "mysql:host={$this->host}, dbname={$this->db_name}",
+        "mysql:host={$this->host}; dbname={$this->db_name}",
         $this->username,
         $this->password     
        );

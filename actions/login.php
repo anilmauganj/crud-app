@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once __DIR__ . '../class/User.php';
+require_once __DIR__ . '/../class/User.php';
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
    $user = new User();
